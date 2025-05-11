@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'https://jspm.dev/uuid';
 import { initialTodos, validationConfig } from "../utils/constants.js";
-import Todo from "../components/Todo.js";
+import Todo from "../components/todo.js";
 import FormValidator from '../components/FormValidator.js';
 import Section from '../components/Section.js';
 import PopupWithForm from '../components/PopupWithForm.js';
@@ -22,6 +22,18 @@ function handleDelete(completed) {
   todoCounter.updateTotal(false);
 }
 
+const renderTodo = (item) => {
+  const todo = new Todo(item, "#todo-template", handleCheck, handleDelete);
+  const todoElement = todo.getView();
+  section.addItem(todoElement);
+};
+
+const section = new Section({
+  items: initialTodos,
+  renderer: renderTodo,
+  containerSelector: ".todos__list",
+});
+
 const addTodoPopup = new PopupWithForm({
   popupSelector: "#add-todo-popup",
   handleFormSubmit: (values) => {
@@ -39,25 +51,12 @@ const addTodoPopup = new PopupWithForm({
       completed: false
     };
     
-    const todo = new Todo(todoData, "#todo-template", handleCheck, handleDelete);
-    const todoElement = todo.getView();
-    section.addItem(todoElement);
+    renderTodo(todoData);
     todoCounter.updateTotal(true);
   }
 });
 
-const section = new Section({
-  items: initialTodos,
-  renderer: (item) => {
-    const todo = new Todo(item, "#todo-template", handleCheck, handleDelete);
-    const todoElement = todo.getView();
-    section.addItem(todoElement);
-  },
-  containerSelector: ".todos__list",
-});
-
 section.renderItems();
-
 addTodoPopup.setEventListeners();
 
 addTodoButton.addEventListener("click", () => {
